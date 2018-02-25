@@ -1,0 +1,47 @@
+<assembly>
+    <id>bin</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <!--<fileSets>-->
+        <!--<fileSet>-->
+            <!--<directory>${project.basedir}/config</directory>-->
+            <!--<outputDirectory>elasticsearch/config</outputDirectory>-->
+        <!--</fileSet>-->
+    <!--</fileSets>-->
+
+    <files>
+        <file>
+            <source>${project.basedir}/src/main/resources/plugin-descriptor.properties</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+    </files>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>/</outputDirectory>
+            <useProjectArtifact>true</useProjectArtifact>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <excludes>
+                <exclude>org.elasticsearch:elasticsearch</exclude>
+            </excludes>
+        </dependencySet>
+        <!--<dependencySet>-->
+            <!--<outputDirectory>/</outputDirectory>-->
+            <!--<useProjectArtifact>true</useProjectArtifact>-->
+            <!--<useTransitiveFiltering>true</useTransitiveFiltering>-->
+            <!--<excludes>-->
+                <!--<exclude>com.google.guava:guava</exclude>-->
+            <!--</excludes>-->
+        <!--</dependencySet>-->
+        <!--<dependencySet>-->
+            <!--<outputDirectory>/</outputDirectory>-->
+            <!--<useProjectArtifact>true</useProjectArtifact>-->
+            <!--<useTransitiveFiltering>true</useTransitiveFiltering>-->
+            <!--<excludes>-->
+                <!--<exclude>joda-time:joda-time</exclude>-->
+            <!--</excludes>-->
+        <!--</dependencySet>-->
+    </dependencySets>
+</assembly>

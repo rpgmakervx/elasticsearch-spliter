@@ -1,8 +1,6 @@
 package org.elasticsearch.plugin.spliter;
 
-import org.elasticsearch.common.inject.Binder;
 import org.elasticsearch.common.inject.Module;
-import org.elasticsearch.index.spliter.RestSpliterAction;
 import org.elasticsearch.plugins.Plugin;
 
 import java.util.Collection;

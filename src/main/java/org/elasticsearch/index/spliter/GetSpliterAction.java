@@ -5,6 +5,7 @@ import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.io.stream.BytesStreamOutput;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
@@ -29,7 +30,8 @@ public class GetSpliterAction extends BaseRestHandler {
     private static final String TYPE = "config";
     private static final String INDEX_TMP = ".spliter";
 
-    protected GetSpliterAction(Settings settings, RestController controller, Client client) {
+    @Inject
+    public GetSpliterAction(Settings settings, RestController controller, Client client) {
         super(settings, controller, client);
         controller.registerHandler(GET, "/_spliter/{splitername}", this);
     }

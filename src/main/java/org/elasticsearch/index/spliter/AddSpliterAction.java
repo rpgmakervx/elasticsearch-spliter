@@ -4,6 +4,8 @@ import com.google.common.base.Strings;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -14,6 +16,8 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.io.stream.BytesStreamOutput;
+import org.elasticsearch.common.logging.ESLogger;
+import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -31,6 +35,8 @@ import static org.elasticsearch.rest.RestRequest.Method.PUT;
  * @author xingtianyu(code4j) Created on 2018-2-26.
  */
 public class AddSpliterAction extends BaseRestHandler {
+
+    private static final ESLogger logger = Loggers.getLogger(AddSpliterAction.class);
 
     private static final String TYPE = "config";
     private static final String INDEX_TMP = ".spliter";
@@ -104,17 +110,17 @@ public class AddSpliterAction extends BaseRestHandler {
     }
 
     private void createIndex(Client client,RestRequest restRequest) throws IOException {
-        GetIndexRequest getIndexRequest = new GetIndexRequest();
-        getIndexRequest.indices(INDEX_TMP);
-        GetIndexResponse getIndexResponse = client.admin().indices().getIndex(getIndexRequest).actionGet();
-        String[] indices = getIndexResponse.getIndices();
-        if (indices == null||indices.length == 0){
+        IndicesExistsRequest existsRequest = new IndicesExistsRequest(INDEX_TMP);
+        IndicesExistsResponse existsResponse = client.admin().indices().exists(existsRequest).actionGet();
+        if (!existsResponse.isExists()){
+            logger.info("logger init index:\n{}",INDEX_TMP);
             CreateIndexRequest request = new CreateIndexRequest();
             request.index(INDEX_TMP);
             CreateIndexResponse response = client.admin().indices().create(request).actionGet();
             response.isAcknowledged();
             createMapper(client,restRequest);
         }
+        logger.info("logger don't need to create index:\n{}",INDEX_TMP);
     }
 
     private void createMapper(Client client,RestRequest restRequest) throws IOException {
@@ -130,6 +136,8 @@ public class AddSpliterAction extends BaseRestHandler {
             builder.endObject();
         }
         builder.endObject().endObject().endObject();
+        logger.info("init mapper:\n{}",builder.string());
+        System.out.println("init mapper:\n"+builder.string());
         PutMappingRequest mappingRequest = Requests.putMappingRequest(INDEX_TMP).type(TYPE).source(builder);
         client.admin().indices().putMapping(mappingRequest).actionGet();
     }

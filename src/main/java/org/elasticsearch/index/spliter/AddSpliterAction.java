@@ -2,44 +2,32 @@ package org.elasticsearch.index.spliter;
 
 import com.google.common.base.Strings;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.inject.Inject;
-import org.elasticsearch.common.io.stream.BytesStreamOutput;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.opt.Doc;
+import org.elasticsearch.index.opt.Index;
 import org.elasticsearch.rest.*;
 
 import java.io.IOException;
 import java.util.Map;
 
-import static org.elasticsearch.rest.RestRequest.Method.GET;
 import static org.elasticsearch.rest.RestRequest.Method.POST;
 import static org.elasticsearch.rest.RestRequest.Method.PUT;
 
 /**
  * @author xingtianyu(code4j) Created on 2018-2-26.
  */
-public class AddSpliterAction extends BaseRestHandler {
+public class AddSpliterAction extends SpliterAction {
 
     private static final ESLogger logger = Loggers.getLogger(AddSpliterAction.class);
-
-    private static final String TYPE = "config";
-    private static final String INDEX_TMP = ".spliter";
 
     @Inject
     public AddSpliterAction(Settings settings, RestController controller, Client client) {
@@ -57,11 +45,10 @@ public class AddSpliterAction extends BaseRestHandler {
      */
     @Override
     protected void handleRequest(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
+        super.handleRequest(restRequest,restChannel,client);
         createIndex(client,restRequest);
-        XContentBuilder builder = restContentBuilder(restRequest);
-        String splitername = restRequest.hasParam("splitername")?
-                restRequest.param("splitername"):null;
-        if (Strings.isNullOrEmpty(splitername)){
+        XContentBuilder builder = restContentBuilder();
+        if (Strings.isNullOrEmpty(spliterName)){
             builder.startObject()
                     .startObject("error")
                     .field("status",400)
@@ -72,83 +59,31 @@ public class AddSpliterAction extends BaseRestHandler {
             return;
         }
         String body = restRequest.content().toUtf8();
-        client.index(indexRequest(splitername,body), new ActionListener<IndexResponse>() {
-            @Override
-            public void onResponse(IndexResponse indexResponse) {
-                try {
-                    if (indexResponse.isCreated()){
-                        builder.startObject().field("operate","created").field("status",200);
-                    }else{
-                        builder.startObject().field("operate","cover").field("status",304);
-                    }
-                    builder.endObject();
-                    restChannel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            @Override
-            public void onFailure(Throwable throwable) {
-                try {
-                    restChannel.sendResponse(
-                            new BytesRestResponse(restChannel, RestStatus.OK, throwable));
-                } catch (IOException e) {
-                    logger.error("build spliter fail,",e);
-                }
-            }
-        });
-
-    }
-
-    private IndexRequest indexRequest(String id,String body){
-        IndexRequest request = new IndexRequest();
-        request.source(body);
-        request.type(TYPE);
-        request.id(id);
-        request.index(INDEX_TMP);
-        return request;
+        IndexRequest request = indexRequest(INDEX_TMP,TYPE,spliterName,body);
+        Doc.insert(client,request,builder,restChannel);
     }
 
     private void createIndex(Client client,RestRequest restRequest) throws IOException {
-        IndicesExistsRequest existsRequest = new IndicesExistsRequest(INDEX_TMP);
-        IndicesExistsResponse existsResponse = client.admin().indices().exists(existsRequest).actionGet();
-        if (!existsResponse.isExists()){
+        if (!Index.exists(client,INDEX_TMP)){
             logger.info("logger init index:\n{}",INDEX_TMP);
-            CreateIndexRequest request = new CreateIndexRequest();
-            request.index(INDEX_TMP);
-            CreateIndexResponse response = client.admin().indices().create(request).actionGet();
-            response.isAcknowledged();
+            Index.createIndex(client,INDEX_TMP);
             createMapper(client,restRequest);
         }
-        logger.info("logger don't need to create index:\n{}",INDEX_TMP);
+        logger.info("logger don't need to createIndex index:\n{}",INDEX_TMP);
     }
 
     private void createMapper(Client client,RestRequest restRequest) throws IOException {
-        XContentBuilder builder = restContentBuilder(restRequest);
-        builder.startObject()
-                .startObject(TYPE)
-                .startObject(SpliterConstant.PROPERTIES);
-        for(Map.Entry<String,Map<String,String>> entry:SpliterIndexMapper.mapper.entrySet()){
-            builder.startObject(entry.getKey());
-            for (Map.Entry<String,String> metaEntry:entry.getValue().entrySet()){
-                builder.field(metaEntry.getKey(),metaEntry.getValue());
-            }
-            builder.endObject();
-        }
-        builder.endObject().endObject().endObject();
-        logger.info("init mapper:\n{}",builder.string());
-        System.out.println("init mapper:\n"+builder.string());
-        PutMappingRequest mappingRequest = Requests.putMappingRequest(INDEX_TMP).type(TYPE).source(builder);
-        client.admin().indices().putMapping(mappingRequest).actionGet();
+        XContentBuilder builder = restContentBuilder();
+        Index.createMapper(client,INDEX_TMP,TYPE,builder);
     }
 
-    private XContentBuilder restContentBuilder(RestRequest request) throws IOException {
-        BytesStreamOutput out = new BytesStreamOutput();
-        XContentBuilder builder = new XContentBuilder(
-                XContentFactory.xContent(XContentType.JSON), out);
-        if (request.paramAsBoolean("pretty", false)) {
-            builder.prettyPrint();
-        }
-        return builder;
+    private IndexRequest indexRequest(String index, String type, String id, String body){
+        IndexRequest request = new IndexRequest();
+        request.source(body);
+        request.type(type);
+        request.id(id);
+        request.index(index);
+        return request;
     }
+
 }

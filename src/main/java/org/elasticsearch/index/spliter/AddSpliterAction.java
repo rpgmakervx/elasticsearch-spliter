@@ -68,7 +68,7 @@ public class AddSpliterAction extends SpliterAction {
             Index.createIndex(client,INDEX_TMP);
             createMapper(client,restRequest);
         }
-        logger.info("logger don't need to createIndex index:\n{}",INDEX_TMP);
+        logger.info("spliter[{}] don't need to createIndex index:{}",spliterName,INDEX_TMP);
     }
 
     private void createMapper(Client client,RestRequest restRequest) throws IOException {

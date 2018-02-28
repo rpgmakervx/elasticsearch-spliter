@@ -39,9 +39,9 @@ public class ExecuteJobAction extends SpliterAction {
     @Override
     protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         if (ALL_CMD.equals(spliterName)){
-            launchSpliter(client);
-        }else{
             launchAllSpliter(client);
+        }else{
+            launchSpliter(client);
         }
 
     }

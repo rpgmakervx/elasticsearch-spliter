@@ -23,6 +23,7 @@ public class Schedulers {
                 .build();
         scheduler.scheduleJob(detail,trigger);
         scheduler.start();
+        System.out.println("job started");
     }
 
     public static void pauseJob(Spliter spliter) throws SchedulerException {
@@ -32,4 +33,15 @@ public class Schedulers {
         scheduler.pauseJob(key);
     }
 
+//    public static void main(String[] args) throws SchedulerException {
+//        Spliter spliter = new Spliter();
+//        spliter.setSpliterName("dtracker");
+//        spliter.setRemain(604800L);
+////        spliter.setPeroid("0 0 * * * ? *");
+//        spliter.setPeroid("*/1 * * * * ?");
+//        spliter.setFormat("yyyyMMdd-HH");
+//        spliter.setIndexName("tk_arch_dtracker-");
+//        spliter.setAliaName("alia_arch_dtracker");
+//        launchJob(spliter);
+//    }
 }

@@ -19,6 +19,7 @@ import org.quartz.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author xingtianyu(code4j) Created on 2018-2-26.
@@ -42,6 +43,7 @@ public class SpliterJob implements Job{
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
+        logger.info("spliter[{}] execute.",spliterName);
         init(context.getJobDetail());
         jobKey = context.getJobDetail().getKey();
         doJob();
@@ -79,10 +81,10 @@ public class SpliterJob implements Job{
         for (String index:indices){
             String createTime = index.replace(spliter.getIndexName(),"");
             DateTime createDateTime = TimeKits.getDateTime(createTime,spliter.getFormat());
-            DateTime invalidDateTime = createDateTime.plus(spliter.getRemain());
+            DateTime invalidDateTime = createDateTime.plus(TimeUnit.SECONDS.toMillis(spliter.getRemain()));
             //true说明超时，当前索引需要删除
             if (TimeKits.after(DateTime.now(),invalidDateTime)){
-                logger.info("id:{} desc:{} delete index name:{}, invalidDateTime:{},format:{}",index,invalidDateTime,spliter.getFormat());
+                logger.info("spliter[{}] delete index name:{}, invalidDateTime:{},format:{}",spliterName,index,invalidDateTime,spliter.getFormat());
                 Index.deleteIndex(client,index);
             }
         }
@@ -94,7 +96,7 @@ public class SpliterJob implements Job{
         String indexName = spliter.getIndexName() + dateTime;
         boolean created = Index.createIndex(client,indexName);
         if (!created){
-            logger.warn("spliter create index fail,indexName [{}]",indexName);
+            logger.warn("spliter[{}] create index fail,indexName [{}]",spliterName,indexName);
             return false;
         }
         return true;

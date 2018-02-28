@@ -27,21 +27,16 @@
                 <exclude>org.elasticsearch:elasticsearch</exclude>
             </excludes>
         </dependencySet>
-        <!--<dependencySet>-->
-            <!--<outputDirectory>/</outputDirectory>-->
-            <!--<useProjectArtifact>true</useProjectArtifact>-->
-            <!--<useTransitiveFiltering>true</useTransitiveFiltering>-->
+        <dependencySet>
+            <outputDirectory>/</outputDirectory>
+            <useProjectArtifact>true</useProjectArtifact>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.quartz-scheduler:quartz</include>
+            </includes>
             <!--<excludes>-->
-                <!--<exclude>com.google.guava:guava</exclude>-->
+                <!--<exclude>slf4j-api:slf4j-api</exclude>-->
             <!--</excludes>-->
-        <!--</dependencySet>-->
-        <!--<dependencySet>-->
-            <!--<outputDirectory>/</outputDirectory>-->
-            <!--<useProjectArtifact>true</useProjectArtifact>-->
-            <!--<useTransitiveFiltering>true</useTransitiveFiltering>-->
-            <!--<excludes>-->
-                <!--<exclude>joda-time:joda-time</exclude>-->
-            <!--</excludes>-->
-        <!--</dependencySet>-->
+        </dependencySet>
     </dependencySets>
 </assembly>

@@ -30,7 +30,6 @@ import static org.elasticsearch.rest.RestRequest.Method.POST;
  */
 public class ExecuteSpliterAction extends SpliterAction {
 
-
     @Inject
     public ExecuteSpliterAction(Settings settings, RestController controller, Client client) {
         super(settings, controller, client);

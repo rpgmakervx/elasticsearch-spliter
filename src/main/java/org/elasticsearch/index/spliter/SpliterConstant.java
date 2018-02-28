@@ -13,6 +13,8 @@ public class SpliterConstant {
 
     public static final String PROPERTIES = "properties";
 
+    public static final String SPLITER_NAME = "spliter_name";
+
     public static final String INDEX_NAME = "index_name";
 
     public static final String ALIA_NAME = "alia_name";
@@ -22,4 +24,6 @@ public class SpliterConstant {
     public static final String REMAIN = "remain";
 
     public static final String FORMAT = "format";
+
+    public static final String DESC = "desc";
 }

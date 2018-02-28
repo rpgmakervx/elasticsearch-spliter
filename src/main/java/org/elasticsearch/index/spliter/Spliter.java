@@ -7,6 +7,8 @@ import java.util.Map;
  */
 public class Spliter {
 
+    private String spliterName;
+
     private String indexName;
 
     private String aliaName;
@@ -17,6 +19,15 @@ public class Spliter {
 
     private Long remain;
 
+    private String desc;
+
+    public String getSpliterName() {
+        return spliterName;
+    }
+
+    public void setSpliterName(String spliterName) {
+        this.spliterName = spliterName;
+    }
 
     public String getIndexName() {
         return indexName;
@@ -58,6 +69,14 @@ public class Spliter {
         this.remain = remain;
     }
 
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     public static class Builder{
 
         public static Spliter build(Map<String,Object> sourceMap){
@@ -66,12 +85,14 @@ public class Spliter {
             String aliaName = String.valueOf(sourceMap.get(SpliterConstant.ALIA_NAME));
             String peroid = String.valueOf(sourceMap.get(SpliterConstant.PERIOD));
             String format = String.valueOf(sourceMap.get(SpliterConstant.FORMAT));
+            String desc = String.valueOf(sourceMap.get(SpliterConstant.DESC));
             Long remain = Long.parseLong(String.valueOf(sourceMap.get(SpliterConstant.REMAIN)));
             spliter.setAliaName(aliaName);
             spliter.setFormat(format);
             spliter.setIndexName(indexPrefix);
             spliter.setPeroid(peroid);
             spliter.setRemain(remain);
+            spliter.setDesc(desc);
             return spliter;
         }
     }

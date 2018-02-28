@@ -5,15 +5,24 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.spliter.Spliter;
 import org.elasticsearch.rest.BytesRestResponse;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.SearchHit;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -85,6 +94,38 @@ public class Doc {
                 }
             }
         });
+    }
+
+    /**
+     * 先获取个数，再设置size进行查询
+     * @param client
+     * @param request
+     * @return
+     */
+    public static List<Spliter> fetchAll(Client client,SearchRequest request){
+        MatchAllQueryBuilder builder = QueryBuilders.matchAllQuery();
+        SearchResponse countReqsponse = client.prepareSearch()
+                .setIndices(request.indices())
+                .setTypes(request.types())
+                .execute().actionGet();
+        long count = countReqsponse.getHits().getTotalHits();
+        SearchResponse response = client.prepareSearch()
+                .setIndices(request.indices())
+                .setTypes(request.types())
+                .setQuery(builder)
+                .setSize((int) count)
+                .execute().actionGet();
+        SearchHit[] hits = response.getHits().getHits();
+        if (hits == null){
+            return null;
+        }
+        List<Spliter> spliters = new ArrayList<>();
+        for (SearchHit hit:hits){
+            Spliter spliter = Spliter.Builder.build(hit.getSource());
+            spliter.setSpliterName(hit.getId());
+            spliters.add(spliter);
+        }
+        return spliters;
     }
 
 }

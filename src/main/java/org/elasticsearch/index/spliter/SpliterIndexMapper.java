@@ -14,10 +14,12 @@ public class SpliterIndexMapper {
 
     static {
         Map<String,String> keywordMapper = Maps.newHashMap();
+        Map<String,String> textMapper = Maps.newHashMap();
         Map<String,String> intMapper = Maps.newHashMap();
         Map<String,String> longMapper = Maps.newHashMap();
         keywordMapper.put("type","string");
         keywordMapper.put("index","not_analyzed");
+        textMapper.put("type","string");
         intMapper.put("type","integer");
         longMapper.put("type","long");
         mapper.put(SpliterConstant.ALIA_NAME, keywordMapper);
@@ -25,6 +27,7 @@ public class SpliterIndexMapper {
         mapper.put(SpliterConstant.FORMAT,keywordMapper);
         mapper.put(SpliterConstant.PERIOD,keywordMapper);
         mapper.put(SpliterConstant.REMAIN,longMapper);
+        mapper.put(SpliterConstant.DESC,textMapper);
     }
 
 }

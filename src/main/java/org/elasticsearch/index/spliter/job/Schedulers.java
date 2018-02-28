@@ -4,6 +4,8 @@ import org.elasticsearch.index.spliter.Spliter;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
+import java.util.Properties;
+
 /**
  * @author xingtianyu(code4j) Created on 2018-2-28.
  */
@@ -27,7 +29,8 @@ public class Schedulers {
     }
 
     public static void pauseJob(Spliter spliter) throws SchedulerException {
-        SchedulerFactory factory = new StdSchedulerFactory();
+        StdSchedulerFactory factory = new StdSchedulerFactory();
+        factory.initialize(new Properties());
         Scheduler scheduler = factory.getScheduler();
         JobKey key = new JobKey(spliter.getSpliterName(),spliter.getSpliterName());
         scheduler.pauseJob(key);

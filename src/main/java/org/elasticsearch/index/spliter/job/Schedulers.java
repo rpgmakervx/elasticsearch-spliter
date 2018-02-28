@@ -12,7 +12,8 @@ import java.util.Properties;
 public class Schedulers {
 
     public static void launchJob(Spliter spliter) throws SchedulerException {
-        SchedulerFactory factory = new StdSchedulerFactory();
+        StdSchedulerFactory factory = new StdSchedulerFactory();
+        factory.initialize(new Properties());
         Scheduler scheduler = factory.getScheduler();
         JobDetail detail = JobBuilder.newJob(SpliterJob.class)
                 .withDescription(spliter.getDesc())

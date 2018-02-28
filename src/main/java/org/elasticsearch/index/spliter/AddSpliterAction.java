@@ -44,8 +44,7 @@ public class AddSpliterAction extends SpliterAction {
      * @throws Exception
      */
     @Override
-    protected void handleRequest(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
-        super.handleRequest(restRequest,restChannel,client);
+    protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         createIndex(client,restRequest);
         XContentBuilder builder = restContentBuilder();
         if (Strings.isNullOrEmpty(spliterName)){

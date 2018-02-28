@@ -11,14 +11,12 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.opt.Index;
-import org.elasticsearch.index.spliter.ExecuteSpliterAction;
 import org.elasticsearch.index.spliter.Spliter;
 import org.elasticsearch.index.spliter.TimeKits;
 import org.joda.time.DateTime;
 import org.quartz.*;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

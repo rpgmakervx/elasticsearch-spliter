@@ -2,9 +2,8 @@ package org.elasticsearch.plugin.spliter;
 
 import org.elasticsearch.common.inject.Binder;
 import org.elasticsearch.common.inject.Module;
-import org.elasticsearch.index.IndexService;
 import org.elasticsearch.index.spliter.AddSpliterAction;
-import org.elasticsearch.index.spliter.ExecuteSpliterAction;
+import org.elasticsearch.index.spliter.ExecuteJobAction;
 import org.elasticsearch.index.spliter.GetSpliterAction;
 
 /**
@@ -16,6 +15,6 @@ public class SplitModule implements Module{
     public void configure(Binder binder) {
         binder.bind(GetSpliterAction.class).asEagerSingleton();
         binder.bind(AddSpliterAction.class).asEagerSingleton();
-        binder.bind(ExecuteSpliterAction.class).asEagerSingleton();
+        binder.bind(ExecuteJobAction.class).asEagerSingleton();
     }
 }

@@ -35,8 +35,7 @@ public class GetSpliterAction extends SpliterAction {
     }
 
     @Override
-    protected void handleRequest(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
-        super.handleRequest(restRequest,restChannel,client);
+    protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         XContentBuilder builder = restContentBuilder();
         if (Strings.isNullOrEmpty(spliterName)){
             builder.startObject()
@@ -50,6 +49,7 @@ public class GetSpliterAction extends SpliterAction {
         }
         GetRequest getRequest = new GetRequest(INDEX_TMP, TYPE, spliterName);
         Doc.get(client,getRequest,builder,restChannel);
+
     }
 
 }

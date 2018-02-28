@@ -34,7 +34,10 @@ abstract public class SpliterAction extends BaseRestHandler {
     protected void handleRequest(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         spliterName = restRequest.hasParam("splitername")?
                 restRequest.param("splitername"):null;
+        action(restRequest,restChannel,client);
     }
+
+    abstract protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception;
 
     protected XContentBuilder restContentBuilder() throws IOException {
         BytesStreamOutput out = new BytesStreamOutput();

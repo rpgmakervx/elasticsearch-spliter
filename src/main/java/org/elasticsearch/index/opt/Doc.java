@@ -96,6 +96,13 @@ public class Doc {
         });
     }
 
+    public static Spliter get(Client client, String index,String type,String id){
+        GetResponse response = client.prepareGet(index,type,id).get();
+        Spliter spliter = Spliter.Builder.build(response.getSource());
+        spliter.setSpliterName(response.getId());
+        return spliter;
+    }
+
     /**
      * 先获取个数，再设置size进行查询
      * @param client

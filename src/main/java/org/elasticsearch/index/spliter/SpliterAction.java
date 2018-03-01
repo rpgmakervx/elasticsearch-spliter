@@ -22,6 +22,7 @@ abstract public class SpliterAction extends BaseRestHandler {
     protected static final String TYPE = "config";
     protected static final String INDEX_TMP = ".spliter";
     protected static final String WILDCARD = "*";
+    protected static final String ALL_CMD = "_all";
 
     protected String spliterName;
 

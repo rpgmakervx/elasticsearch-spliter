@@ -43,10 +43,15 @@ public class SpliterJob implements Job{
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        logger.info("spliter[{}] execute.",spliterName);
-        init(context.getJobDetail());
-        jobKey = context.getJobDetail().getKey();
-        doJob();
+        try {
+            System.out.println("execute job");
+            logger.info("spliter[{}] execute.",spliterName);
+            init(context.getJobDetail());
+            jobKey = context.getJobDetail().getKey();
+            doJob();
+        }catch (Exception e){
+            logger.error("spliter[{}] Exception occur while job is running.",e);
+        }
     }
 
     private void init(JobDetail job){
@@ -94,6 +99,7 @@ public class SpliterJob implements Job{
     private boolean createIndex(Client client,Spliter spliter){
         String dateTime = TimeKits.getCurrentDateFormatted(spliter.getFormat());
         String indexName = spliter.getIndexName() + dateTime;
+        logger.info("spliter[{}] create new index[{}]",spliter.getSpliterName(),indexName);
         boolean created = Index.createIndex(client,indexName);
         if (!created){
             logger.warn("spliter[{}] create index fail,indexName [{}]",spliterName,indexName);
@@ -123,6 +129,7 @@ public class SpliterJob implements Job{
                     .endObject()
                     .endObject();
             boolean ack = Index.createAlias(client,builder);
+            logger.info("spliter[{}] create alias[{}] for index[{}]",spliter.getSpliterName(),spliter.getAliaName(),indexName);
             if (!ack){
                 logger.error("spliter[{}] create alia fail,indexName[{}] aliasName[{}]",spliterName,indexName,spliter.getAliaName());
                 return false;
@@ -144,6 +151,7 @@ public class SpliterJob implements Job{
                     .endObject();
         }
         builder.endArray().endObject().endObject();
+        logger.info("spliter[{}] bind alias[{}] to index[{}]",spliter.getSpliterName(),spliter.getAliaName(),indexName);
         if (!Index.createAlias(client,builder)){
             logger.error("spliter[{}] rebind alias fail, rest body is:\n{}",spliterName,builder.string());
             return false;

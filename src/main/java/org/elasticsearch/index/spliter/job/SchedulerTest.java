@@ -13,7 +13,7 @@ public class SchedulerTest {
     public static void main(String[] args) throws SchedulerException, InterruptedException {
         SchedulerFactory factory = new StdSchedulerFactory();
         Scheduler scheduler = factory.getScheduler();
-        JobDetail detail = JobBuilder.newJob(SpliterJob.class)
+        JobDetail detail = JobBuilder.newJob(TestJob.class)
                 .withDescription("test job")
                 .withIdentity("spliterjob","splitergroup")
                 .build();

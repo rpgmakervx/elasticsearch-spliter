@@ -6,13 +6,13 @@ import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.opt.Doc;
 import org.elasticsearch.index.spliter.job.Schedulers;
-import org.elasticsearch.rest.RestChannel;
-import org.elasticsearch.rest.RestController;
-import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.*;
 import org.quartz.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.elasticsearch.rest.RestRequest.Method.POST;
@@ -26,8 +26,6 @@ import static org.elasticsearch.rest.RestRequest.Method.POST;
  */
 public class ExecuteJobAction extends SpliterAction {
 
-    private static final String ALL_CMD = "_all";
-
     private static final ESLogger logger = Loggers.getLogger(ExecuteJobAction.class);
 
     @Inject
@@ -38,30 +36,55 @@ public class ExecuteJobAction extends SpliterAction {
 
     @Override
     protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
+        XContentBuilder builder = restContentBuilder();
         if (ALL_CMD.equals(spliterName)){
-            launchAllSpliter(client);
+            List<String> spliterNames = launchAllSpliter(client);
+            builder.startObject()
+                    .startObject("execution")
+                    .field("mode","all")
+                    .startArray("jobs");
+            if (spliterNames != null){
+                for (String spliterName:spliterNames){
+                    builder.field("name",spliterName)
+                            .field("status","running");
+                }
+                builder.endArray().endObject().endObject();
+            }
         }else{
-            launchSpliter(client);
+            String spliterName = launchSpliter(client);
+            builder.startObject()
+                    .startObject("execution")
+                    .field("mode","single")
+                    .startObject("job")
+                    .field("status","running")
+                    .field("name",spliterName)
+                    .endObject()
+                    .endObject()
+                    .endObject();
         }
-
+        restChannel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
     }
 
-    private void launchSpliter(Client client) throws SchedulerException {
+    private String launchSpliter(Client client) throws SchedulerException {
         Spliter spliter = Doc.get(client,INDEX_TMP,TYPE,spliterName);
-        Schedulers.launchJob(spliter);
+        Schedulers.launchJob(client,spliter);
+        return spliter.getSpliterName();
     }
 
-    private void launchAllSpliter(Client client) throws SchedulerException {
+    private List<String> launchAllSpliter(Client client) throws SchedulerException {
         SearchRequest request = new SearchRequest();
         request.indices(INDEX_TMP);
         request.types(TYPE);
         List<Spliter> spliters = Doc.fetchAll(client,request);
         if (spliters == null){
-            return;
+            return null;
         }
+        List<String> spliterNames = new ArrayList<>();
         for (Spliter spliter:spliters){
-            Schedulers.launchJob(spliter);
+            Schedulers.launchJob(client,spliter);
+            spliterNames.add(spliter.getSpliterName());
         }
+        return spliterNames;
     }
 
 }

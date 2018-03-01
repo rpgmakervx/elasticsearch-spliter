@@ -1,5 +1,6 @@
 package org.elasticsearch.index.spliter.job;
 
+import org.elasticsearch.client.Client;
 import org.elasticsearch.index.spliter.Spliter;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -11,14 +12,18 @@ import java.util.Properties;
  */
 public class Schedulers {
 
-    public static void launchJob(Spliter spliter) throws SchedulerException {
+    public static void launchJob(Client client, Spliter spliter) throws SchedulerException {
         StdSchedulerFactory factory = new StdSchedulerFactory();
-        factory.initialize(new Properties());
+        Properties properties = new Properties();
+        properties.put("org.quartz.threadPool.threadCount","10");
+        factory.initialize(properties);
         Scheduler scheduler = factory.getScheduler();
         JobDetail detail = JobBuilder.newJob(SpliterJob.class)
                 .withDescription(spliter.getDesc())
                 .withIdentity(spliter.getSpliterName(),spliter.getSpliterName())
                 .build();
+        detail.getJobDataMap().put("spliterName",spliter.getSpliterName());
+        detail.getJobDataMap().put("client",client);
         Trigger trigger = TriggerBuilder.newTrigger()
                 .startNow()
                 .withIdentity(spliter.getSpliterName(),spliter.getSpliterName())
@@ -31,7 +36,9 @@ public class Schedulers {
 
     public static void pauseJob(Spliter spliter) throws SchedulerException {
         StdSchedulerFactory factory = new StdSchedulerFactory();
-        factory.initialize(new Properties());
+        Properties properties = new Properties();
+        properties.put("org.quartz.threadPool.threadCount","10");
+        factory.initialize(properties);
         Scheduler scheduler = factory.getScheduler();
         JobKey key = new JobKey(spliter.getSpliterName(),spliter.getSpliterName());
         scheduler.pauseJob(key);

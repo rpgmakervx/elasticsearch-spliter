@@ -30,6 +30,7 @@ public class ResumeJobAction extends SpliterAction{
     protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         XContentBuilder builder = restContentBuilder();
         if (ALL_CMD.equals(spliterName)){
+            logger.info("spliter[{}] job[{}] resuming...",spliterName,ALL_CMD);
             List<String> spliterNames = resumeAllSpliter(client);
             builder.startObject()
                     .startObject("execution")
@@ -43,6 +44,7 @@ public class ResumeJobAction extends SpliterAction{
                 builder.endArray().endObject().endObject();
             }
         }else {
+            logger.info("spliter[{}] job[{}] resuming...",spliterName,ALL_CMD);
             resumeSpliter(client);
             builder.startObject()
                     .startObject("execution")

@@ -29,6 +29,8 @@ public class SpliterPlugin extends Plugin {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new SpecialPermission());
+            sm.checkPermission(new RuntimePermission("getClassLoader"));
+
         }
         AccessController.doPrivileged(new PrivilegedAction<Void>() {
             @Override

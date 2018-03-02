@@ -30,6 +30,7 @@ public class PauseJobAction extends SpliterAction {
     protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         XContentBuilder builder = restContentBuilder();
         if (ALL_CMD.equals(spliterName)){
+            logger.info("spliter[{}] job[{}] pausing...",spliterName,ALL_CMD);
             List<String> spliterNames = pauseAllSpliter(client);
             builder.startObject()
                     .startObject("execution")
@@ -43,6 +44,7 @@ public class PauseJobAction extends SpliterAction {
                 builder.endArray().endObject().endObject();
             }
         }else {
+            logger.info("spliter[{}] job[{}] pausing...",spliterName,spliterName);
             pauseSpliter(client);
             builder.startObject()
                     .startObject("execution")

@@ -16,10 +16,14 @@ import org.elasticsearch.index.spliter.TimeKits;
 import org.joda.time.DateTime;
 import org.quartz.*;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 /**
  * @author xingtianyu(code4j) Created on 2018-2-26.
@@ -80,7 +84,9 @@ public class SpliterJob implements Job{
 
     private void deleteIndex(Client client, Spliter spliter){
         List<String> indices = Index.getIndices(client,spliter.getIndexName()+WILDCARD);
+        logger.info("spliter[{}] ready to delete,index parttern[{}]",spliter.getSpliterName(),spliter.getIndexName()+WILDCARD);
         if (indices == null){
+            logger.info("spliter[{}] no index to delete,index parttern[{}]",spliter.getSpliterName(),spliter.getIndexName()+WILDCARD);
             return;
         }
         for (String index:indices){
@@ -118,17 +124,7 @@ public class SpliterJob implements Job{
         String indexName = spliter.getIndexName() + dateTime;
         boolean aliaExists = Index.exists(client,spliter.getAliaName());
         if (!aliaExists){
-            builder.startObject()
-                    .startObject("actions")
-                    .startArray()
-                    .startObject("add")
-                    .field("index",indexName)
-                    .field("alias",spliter.getAliaName())
-                    .endObject()
-                    .endArray()
-                    .endObject()
-                    .endObject();
-            boolean ack = Index.createAlias(client,builder);
+            boolean ack = Index.createAlias(client,spliter.getAliaName(),indexName);
             logger.info("spliter[{}] create alias[{}] for index[{}]",spliter.getSpliterName(),spliter.getAliaName(),indexName);
             if (!ack){
                 logger.error("spliter[{}] create alia fail,indexName[{}] aliasName[{}]",spliterName,indexName,spliter.getAliaName());
@@ -136,23 +132,9 @@ public class SpliterJob implements Job{
             }
             return ack;
         }
-        builder.startObject()
-                .startObject("actions")
-                .startArray()
-                .startObject("add")
-                .field("index",indexName)
-                .field("alias",spliter.getAliaName())
-                .endObject();
         List<String> unBindIndices = Index.getIndices(client,spliter.getAliaName());
-        for (String unBindIndex:unBindIndices){
-            builder.startObject("remove")
-                    .field("index",unBindIndex)
-                    .field("alias",spliter.getAliaName())
-                    .endObject();
-        }
-        builder.endArray().endObject().endObject();
         logger.info("spliter[{}] bind alias[{}] to index[{}]",spliter.getSpliterName(),spliter.getAliaName(),indexName);
-        if (!Index.createAlias(client,builder)){
+        if (!Index.rebindAlias(client,spliter.getAliaName(),indexName,unBindIndices)){
             logger.error("spliter[{}] rebind alias fail, rest body is:\n{}",spliterName,builder.string());
             return false;
         }
@@ -182,4 +164,6 @@ public class SpliterJob implements Job{
         builder.prettyPrint();
         return builder;
     }
+
+
 }

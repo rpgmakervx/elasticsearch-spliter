@@ -3,10 +3,7 @@ package org.elasticsearch.plugin.spliter;
 import org.elasticsearch.SpecialPermission;
 import org.elasticsearch.common.inject.Binder;
 import org.elasticsearch.common.inject.Module;
-import org.elasticsearch.index.spliter.AddSpliterAction;
-import org.elasticsearch.index.spliter.ExecuteJobAction;
-import org.elasticsearch.index.spliter.GetSpliterAction;
-import org.elasticsearch.index.spliter.PauseJobAction;
+import org.elasticsearch.index.spliter.*;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -22,5 +19,6 @@ public class SplitModule implements Module{
         binder.bind(AddSpliterAction.class).asEagerSingleton();
         binder.bind(ExecuteJobAction.class).asEagerSingleton();
         binder.bind(PauseJobAction.class).asEagerSingleton();
+        binder.bind(ResumeJobAction.class).asEagerSingleton();
     }
 }

@@ -16,21 +16,21 @@ import java.util.List;
 import static org.elasticsearch.rest.RestRequest.Method.POST;
 
 /**
- * @author xingtianyu(code4j) Created on 2018-2-28.
+ * @author xingtianyu(code4j) Created on 2018-3-1.
  */
-public class PauseJobAction extends SpliterAction {
+public class ResumeJobAction extends SpliterAction{
 
     @Inject
-    public PauseJobAction(Settings settings, RestController controller, Client client) {
+    public ResumeJobAction(Settings settings, RestController controller, Client client) {
         super(settings, controller, client);
-        controller.registerHandler(POST, "/_spliter/{splitername}/pause", this);
+        controller.registerHandler(POST, "/_spliter/{splitername}/resume", this);
     }
 
     @Override
     protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         XContentBuilder builder = restContentBuilder();
         if (ALL_CMD.equals(spliterName)){
-            List<String> spliterNames = pauseAllSpliter(client);
+            List<String> spliterNames = resumeAllSpliter(client);
             builder.startObject()
                     .startObject("execution")
                     .field("mode","all")
@@ -38,17 +38,17 @@ public class PauseJobAction extends SpliterAction {
             if (spliterNames != null){
                 for (String spliterName:spliterNames){
                     builder.field("name",spliterName)
-                            .field("status","paused");
+                            .field("status","resumed");
                 }
                 builder.endArray().endObject().endObject();
             }
         }else {
-            pauseSpliter(client);
+            resumeSpliter(client);
             builder.startObject()
                     .startObject("execution")
                     .field("mode","single")
                     .startObject("job")
-                    .field("status","paused")
+                    .field("status","resumed")
                     .field("name",spliterName)
                     .endObject()
                     .endObject()
@@ -57,13 +57,13 @@ public class PauseJobAction extends SpliterAction {
         restChannel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
     }
 
-    public String pauseSpliter(Client client) throws SchedulerException {
+    public String resumeSpliter(Client client) throws SchedulerException {
         Spliter spliter = Doc.get(client,INDEX_TMP,TYPE,spliterName);
-        Schedulers.pauseJob(spliter);
+        Schedulers.resumeJob(spliter);
         return spliter.getSpliterName();
     }
 
-    public List<String> pauseAllSpliter(Client client) throws SchedulerException {
+    public List<String> resumeAllSpliter(Client client) throws SchedulerException {
         SearchRequest request = new SearchRequest();
         request.indices(INDEX_TMP);
         request.types(TYPE);
@@ -73,7 +73,7 @@ public class PauseJobAction extends SpliterAction {
         }
         List<String> spliterNames = new ArrayList<>();
         for (Spliter spliter:spliters){
-            Schedulers.pauseJob(spliter);
+            Schedulers.resumeJob(spliter);
             spliterNames.add(spliter.getSpliterName());
         }
         return spliterNames;

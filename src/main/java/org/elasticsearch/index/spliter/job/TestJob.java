@@ -4,6 +4,8 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import java.util.concurrent.Executors;
+
 /**
  * @author xingtianyu(code4j) Created on 2018-3-1.
  */
@@ -18,4 +20,5 @@ public class TestJob implements Job {
             e.printStackTrace();
         }
     }
+
 }

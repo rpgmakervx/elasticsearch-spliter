@@ -22,6 +22,7 @@ public class SpliterIndexMapper {
         textMapper.put("type","string");
         intMapper.put("type","integer");
         longMapper.put("type","long");
+        mapper.put(SpliterConstant.SPLITER_NAME, keywordMapper);
         mapper.put(SpliterConstant.ALIA_NAME, keywordMapper);
         mapper.put(SpliterConstant.INDEX_NAME,keywordMapper);
         mapper.put(SpliterConstant.FORMAT,keywordMapper);

@@ -12,11 +12,21 @@ import java.util.Properties;
  */
 public class Schedulers {
 
-    public static void launchJob(Client client, Spliter spliter) throws SchedulerException {
-        StdSchedulerFactory factory = new StdSchedulerFactory();
+    private static StdSchedulerFactory factory;
+
+    static {
+        factory = new StdSchedulerFactory();
         Properties properties = new Properties();
         properties.put("org.quartz.threadPool.threadCount","10");
-        factory.initialize(properties);
+        try {
+            factory.initialize(properties);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void launchJob(Client client, Spliter spliter) throws SchedulerException {
         Scheduler scheduler = factory.getScheduler();
         JobDetail detail = JobBuilder.newJob(SpliterJob.class)
                 .withDescription(spliter.getDesc())
@@ -35,24 +45,15 @@ public class Schedulers {
     }
 
     public static void pauseJob(Spliter spliter) throws SchedulerException {
-        StdSchedulerFactory factory = new StdSchedulerFactory();
-        Properties properties = new Properties();
-        properties.put("org.quartz.threadPool.threadCount","10");
-        factory.initialize(properties);
         Scheduler scheduler = factory.getScheduler();
         JobKey key = new JobKey(spliter.getSpliterName(),spliter.getSpliterName());
         scheduler.pauseJob(key);
     }
 
-//    public static void main(String[] args) throws SchedulerException {
-//        Spliter spliter = new Spliter();
-//        spliter.setSpliterName("dtracker");
-//        spliter.setRemain(604800L);
-////        spliter.setPeroid("0 0 * * * ? *");
-//        spliter.setPeroid("*/1 * * * * ?");
-//        spliter.setFormat("yyyyMMdd-HH");
-//        spliter.setIndexName("tk_arch_dtracker-");
-//        spliter.setAliaName("alia_arch_dtracker");
-//        launchJob(spliter);
-//    }
+    public static void resumeJob(Spliter spliter) throws SchedulerException {
+        Scheduler scheduler = factory.getScheduler();
+        JobKey key = new JobKey(spliter.getSpliterName(),spliter.getSpliterName());
+        scheduler.resumeJob(key);
+    }
+
 }

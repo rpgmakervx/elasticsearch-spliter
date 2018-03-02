@@ -45,7 +45,7 @@ public class AddSpliterAction extends SpliterAction {
      */
     @Override
     protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
-        createIndex(client,restRequest);
+        createIndex(client);
         XContentBuilder builder = restContentBuilder();
         if (Strings.isNullOrEmpty(spliterName)){
             builder.startObject()
@@ -62,16 +62,16 @@ public class AddSpliterAction extends SpliterAction {
         Doc.insert(client,request,builder,restChannel);
     }
 
-    private void createIndex(Client client,RestRequest restRequest) throws IOException {
+    private void createIndex(Client client) throws IOException {
         if (!Index.exists(client,INDEX_TMP)){
             logger.info("logger init index:\n{}",INDEX_TMP);
             Index.createIndex(client,INDEX_TMP);
-            createMapper(client,restRequest);
+            createMapper(client);
         }
         logger.info("spliter[{}] don't need to createIndex index:{}",spliterName,INDEX_TMP);
     }
 
-    private void createMapper(Client client,RestRequest restRequest) throws IOException {
+    private void createMapper(Client client) throws IOException {
         XContentBuilder builder = restContentBuilder();
         Index.createMapper(client,INDEX_TMP,TYPE,builder);
     }

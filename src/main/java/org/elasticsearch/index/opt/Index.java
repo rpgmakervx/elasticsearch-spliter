@@ -2,6 +2,8 @@ package org.elasticsearch.index.opt;
 
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.alias.Alias;
+import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
+import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -47,10 +49,17 @@ public class Index {
         return response.isAcknowledged();
     }
 
-    public static boolean createAlias(Client client,XContentBuilder mapper) throws IOException {
-        CreateIndexRequest request = new CreateIndexRequest();
-        request.aliases(mapper);
-        CreateIndexResponse response = client.admin().indices().create(request).actionGet();
+    public static boolean createAlias(Client client,String aliasName,String newIndex) throws IOException {
+        IndicesAliasesRequest request = new IndicesAliasesRequest();
+        request.addAlias(aliasName,newIndex);
+        IndicesAliasesResponse response = client.admin().indices().aliases(request).actionGet();
+        return response.isAcknowledged();
+    }
+    public static boolean rebindAlias(Client client,String aliasName,String newIndex,List<String> indices) throws IOException {
+        IndicesAliasesRequest request = new IndicesAliasesRequest();
+        request.addAlias(aliasName,newIndex);
+        request.removeAlias(indices.toArray(new String[indices.size()]),aliasName);
+        IndicesAliasesResponse response = client.admin().indices().aliases(request).actionGet();
         return response.isAcknowledged();
     }
 

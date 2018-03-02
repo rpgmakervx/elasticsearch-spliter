@@ -37,6 +37,7 @@ public class ExecuteJobAction extends SpliterAction {
     @Override
     protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         XContentBuilder builder = restContentBuilder();
+        logger.info("spliter[{}] job[{}] starting...",spliterName,spliterName);
         if (ALL_CMD.equals(spliterName)){
             List<String> spliterNames = launchAllSpliter(client);
             builder.startObject()

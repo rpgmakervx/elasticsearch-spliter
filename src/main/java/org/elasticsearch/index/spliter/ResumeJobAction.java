@@ -29,8 +29,8 @@ public class ResumeJobAction extends SpliterAction{
     @Override
     protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         XContentBuilder builder = restContentBuilder();
+        logger.info("spliter[{}] job[{}] resuming...",spliterName,spliterName);
         if (ALL_CMD.equals(spliterName)){
-            logger.info("spliter[{}] job[{}] resuming...",spliterName,ALL_CMD);
             List<String> spliterNames = resumeAllSpliter(client);
             builder.startObject()
                     .startObject("execution")

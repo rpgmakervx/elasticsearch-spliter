@@ -29,8 +29,8 @@ public class PauseJobAction extends SpliterAction {
     @Override
     protected void action(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         XContentBuilder builder = restContentBuilder();
+        logger.info("spliter[{}] job[{}] pausing...",spliterName,spliterName);
         if (ALL_CMD.equals(spliterName)){
-            logger.info("spliter[{}] job[{}] pausing...",spliterName,ALL_CMD);
             List<String> spliterNames = pauseAllSpliter(client);
             builder.startObject()
                     .startObject("execution")

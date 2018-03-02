@@ -2,6 +2,7 @@ package org.elasticsearch.index.spliter.job;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.spliter.Spliter;
+import org.elasticsearch.node.settings.NodeSettingsService;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
